@@ -1,0 +1,105 @@
+
+    int solve(vector<int>& nums,int n,int pre,int cur){
+        
+        if(cur==n)
+            return 0;
+        
+        int include=0;
+        if( pre==-1 || nums[pre]<nums[cur])
+           include = 1 + solve(nums,n,cur,cur+1);
+        
+           int exclude = solve(nums,n,pre,cur+1);
+        
+        return max(include,exclude);
+        
+    }
+    
+    int solveMemo(vector<int>& nums,vector<vector<int>> &dp,int n,int pre,int cur){
+        
+        if(cur==n)
+            return 0;
+        
+        if(dp[cur][pre+1]!=-1)
+            return dp[cur][pre+1];
+        
+        int include=0;
+        if( pre==-1 || nums[pre]<nums[cur])
+           include = 1 + solveMemo(nums,dp,n,cur,cur+1);
+        
+           int exclude = solveMemo(nums,dp,n,pre,cur+1);
+        
+           dp[cur][pre+1] = max(include,exclude);
+        
+        return dp[cur][pre+1];
+        
+    }
+    
+    int solvedp(vector<int>& nums,int n){
+        
+        vector<vector<int>> dp(n+1,vector<int>(n+1,0));
+        
+        for(int i=n-1;i>=0;i--){
+            for(int j=i-1;j>=-1;j--){
+                
+                int include=0;
+                if( j==-1 || nums[j]<nums[i])
+                  include = 1 + dp[i+1][i+1];
+        
+                int exclude = dp[i+1][j+1];
+        
+                 dp[i][j+1] = max(include,exclude);
+            }
+        }
+        return dp[0][0];
+    }
+
+        int solveso(vector<int>& nums,int n){
+
+            vector<int> next(n+1,0);
+            vector<int> cur(n+1,0);
+        
+        for(int i=n-1;i>=0;i--){
+            for(int j=i-1;j>=-1;j--){
+                
+                int include=0;
+                if( j==-1 || nums[j]<nums[i])
+                  include = 1 + next[i+1];
+        
+                int exclude = next[j+1];
+        
+                 cur[j+1] = max(include,exclude);
+            }
+            next=cur;
+        }
+        return next[0];
+    }
+    
+    int solveOptimal(vector<int>& nums,int n){
+        
+        if(!n)
+            return 0;
+        
+        vector<int> ans;
+        ans.push_back(nums[0]);
+        
+        for(int i=1;i<n;i++){
+            
+            if(nums[i]>ans.back())
+                ans.push_back(nums[i]);
+            
+            else{
+                int index=lower_bound(ans.begin(),ans.end(),nums[i])-ans.begin();
+                ans[index]=nums[i];
+        }
+        }
+        return ans.size();
+    }
+    
+    int lengthOfLIS(vector<int>& nums) {
+        //return solve(nums,nums.size(),-1,0);
+        //vector<vector<int>> dp(nums.size(),vector<int>(nums.size()+1,-1));
+        //return solveMemo(nums,dp,nums.size(),-1,0);
+        // return solvedp(nums,nums.size());
+        //return solveso(nums,nums.size());
+        return solveOptimal(nums,nums.size());
+    }
